@@ -16,17 +16,19 @@ import org.apache.spark.{SparkConf, SparkContext}
   *   2）效率高，决策树只需要一次构建，反复使用，每一次预测的最大计算次数不超过决策树的深度。
   *
   * 随机森林（Random Forset），顾名思义就是用随机的方式建立一个森林，森林里面有很多的决策树组成，随机森林的每一棵决策树之间是没有关联的。随机森林可以看做是决策树的复数集合，在分类和
-  *                           回归应用中是最为成功的机器学习模型之一。MLlib中的随机森林支持二元和多元分类，支持连续特征和分类特征的回归。
+  *                           回归应用中是最为成功的机器学习模型之一。随机森林整合了许多决策树以降低过度拟合的风险，并且同决策树算法一样，随机森林在处理类别特征时不需要进行特征自适
+  *                           应（feature scaling）。MLlib中的随机森林支持二元和多元分类，支持连续特征和分类特征的回归。
   *
   * @see http://blog.selfup.cn/877.html
   *      http://www.cnblogs.com/bourneli/archive/2013/03/15/2961568.html
-  * Created by hadoop on 2016/12/14.
+  *
+  * Created by liangjian on 2016/12/14.
   */
 object MLlibAlgorithm_decisionTree {
 
   /*决策树*/
   def decisionTree = {
-    val conf = new SparkConf().setAppName("regression").setMaster("local[2]")
+    val conf = new SparkConf().setAppName("decisionTree").setMaster("local[2]")
     val sc = new SparkContext(conf)
 
     val data = sc.textFile("C:\\D\\train\\decision_tree\\sample_tree_data.csv")
@@ -39,9 +41,19 @@ object MLlibAlgorithm_decisionTree {
     val maxDepth = 5
     val model = DecisionTree.train(parsedData, Algo.Classification, Gini, maxDepth)
 
+    /*用训练后的模型预测数据分类*/
     val labelAndPreds = parsedData.map{ point =>
-      val prediction = model
+      val prediction = model.predict(point.features)
+      (point.label, prediction)  // 真实分类和预测分类
     }
+    val trainErr = labelAndPreds.filter(r => r._1 != r._2).count().toDouble / parsedData.count()
+    println("Training Error = " + trainErr)
+
+    /**
+      * output:
+      * maxDepth = 5 时，Training Error = 0.008787346221441126
+      * maxDepth = 10 时，Training Error = 0.0
+      */
   }
 
   /*随机森林*/
@@ -77,6 +89,6 @@ object MLlibAlgorithm_decisionTree {
   }
 
   def main(args: Array[String]) {
-
+    decisionTree
   }
 }
