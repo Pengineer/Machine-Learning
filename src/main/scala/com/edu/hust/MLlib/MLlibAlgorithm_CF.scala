@@ -1,5 +1,6 @@
 package com.edu.hust.MLlib
 
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel}
 import org.apache.spark.rdd.RDD
@@ -11,6 +12,8 @@ import org.apache.spark.{SparkConf, SparkContext}
   * （1）基于用户的推荐（通过共同口味与偏好找相似邻居用户，K-邻居算法，你朋友喜欢，你也可能喜欢）
   * （2）基于项目的推荐（发现物品之间的相似度，推荐类似的物品，你喜欢物品A，C与A相似，你可能也喜欢C）
   * （3）基于模型的推荐（基于样本的用户喜好信息构造一个推荐模型，然后根据实时的用户喜好信息预测推荐）
+  *
+  * 不像传统的内容推荐，协同过滤不需要考虑物品的属性问题、用户的行为和行业问题等名只需要建立用户与物品的关联关系即可。
   *
   * MLlib目前支持基于模型的协同过滤推荐，其中用户和商品通过一小组隐语义因子（如浏览，单机，购买，点赞，分享等）进行表达，并且这些因子也用于预测确实的元素。
   * 为此，MLlib实现了交替最小二乘法（ALS）来学习这些隐性语义因子。在MLlib中的实现有如下参数：
@@ -52,7 +55,11 @@ object MLlibAlgorithm_CF {
   }
 
   def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("cf").setMaster("local")//.setExecutorEnv("spark.executor.extraJavaOptions", "-Xss200M")
+    /*屏蔽不必要的日志显示在终端*/
+    Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
+    Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
+
+    val conf = new SparkConf().setAppName("cf").setMaster("local")//.setExecutorEnv("spark.executor.extraJavaOptions", "-Xss200m")
     val sc = new SparkContext(conf)
 
     val splits:(RDD[Rating], RDD[Rating]) = splitData(sc)
