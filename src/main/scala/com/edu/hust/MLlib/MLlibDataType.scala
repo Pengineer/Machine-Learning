@@ -14,7 +14,7 @@ import org.apache.spark.ml.linalg.{Matrices, Matrix, Vector, Vectors}
   * 标记向量：由一个标签和一个本地向量组成。在MLlib中，监督学习算法会使用标记向量。在标记向量中我们会使用一个double类型来存储一个标签。
   *          对二元分类来说，一个标签或为0（负向）或为1（正向）；对于多元分类来说，标签应该是从0开始的索引，如0,1,2,3，.......
   *
-  * 本地矩阵：一个本地矩阵由整型的行列索引号和对应的double型值数据组成。MLlib支持密集矩阵，密集矩阵的值优先以列的方式存储在一个double数组中。
+  * 本地矩阵：也叫局部矩阵，一个本地矩阵由整型的行列索引号和对应的double型值数据组成。MLlib支持密集矩阵，密集矩阵的值优先以列的方式存储在一个double数组中。
   *             1.0   2.0
   *             3.0   4.0
   *             5.0   6.0
@@ -31,13 +31,13 @@ import org.apache.spark.ml.linalg.{Matrices, Matrix, Vector, Vectors}
 object MLlibDataType {
 
   def main(args: Array[String]) {
-    /*创建密集矩阵*/
+    /*创建密集向量*/
     val dv:Vector = Vectors.dense(1.0, 0.0, 3.0)
 
-    /*以数组的方式创建稀疏矩阵（只列出非零条目）*/
+    /*以数组的方式创建稀疏向量（只列出非零条目）*/
     val sv1:Vector = Vectors.sparse(3, Array(0,2), Array(1.0,3.0))
 
-    /*以序列的方式创建稀疏矩阵（只列出非零条目）*/
+    /*以序列的方式创建稀疏向量（只列出非零条目）*/
     val sv2:Vector = Vectors.sparse(3, Seq((0,1.0), (2,3.0)))
 
     /******************************************/
