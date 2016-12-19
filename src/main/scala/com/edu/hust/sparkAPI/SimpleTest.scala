@@ -18,7 +18,12 @@ object SimpleTest {
 //      println(rank + ", " + lambda + ", " + numIter)
 //    }
 
-    val file = Source.fromFile("src\\main\\scala\\com\\edu\\hust\\MLlib\\example\\personalRatings.txt")
-    print(file.mkString)
+//    val file = Source.fromFile("src\\main\\scala\\com\\edu\\hust\\MLlib\\example\\personalRatings.txt")
+//    print(file.mkString)
+
+        val file = Source.fromFile("src/ext.dic")
+        print(file.mkString)
+
+
   }
 }
