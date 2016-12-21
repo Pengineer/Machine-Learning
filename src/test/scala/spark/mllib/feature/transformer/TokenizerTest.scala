@@ -1,5 +1,7 @@
-import org.apache.spark.sql.SparkSession
+package spark.mllib.feature.transformer
+
 import org.apache.spark.ml.feature.{RegexTokenizer, Tokenizer}
+import org.apache.spark.sql.SparkSession
 
 /**
   * spark自带的分词技术

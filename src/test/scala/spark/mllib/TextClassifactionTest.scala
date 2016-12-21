@@ -1,3 +1,5 @@
+package spark.mllib
+
 
 import org.apache.spark.mllib.feature.{HashingTF, IDF}
 import org.apache.spark.mllib.linalg.{SparseVector, Vector}

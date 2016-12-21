@@ -1,3 +1,5 @@
+package spark.mllib.api
+
 import org.apache.spark.sql.SparkSession
 
 /**
