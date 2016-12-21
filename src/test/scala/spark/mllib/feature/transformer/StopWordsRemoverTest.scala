@@ -16,7 +16,7 @@ import org.apache.spark.sql.SparkSession
   */
 object StopWordsRemoverTest {
   def main(args: Array[String]) {
-    val spark = SparkSession.builder().appName("TokenizerTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("StopWordsRemoverTest").master("local").getOrCreate()
     val remover = new StopWordsRemover()
       .setInputCol("raw")
       .setOutputCol("filtered")

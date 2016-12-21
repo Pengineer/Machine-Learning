@@ -12,7 +12,7 @@ import org.apache.spark.sql.SparkSession
   */
 object NGramTest {
   def main(args: Array[String]) {
-    val spark = SparkSession.builder().appName("TokenizerTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("NGramTest").master("local").getOrCreate()
     val wordDataFrame = spark.createDataFrame(Seq(
       (0, Array("Hi", "I", "heard", "about", "Spark")),
       (1, Array("I", "wish", "Java", "could", "use", "case", "classes")),

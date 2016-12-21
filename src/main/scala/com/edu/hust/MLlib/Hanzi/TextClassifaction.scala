@@ -108,7 +108,11 @@ class TextClassifaction extends Serializable {
     }
 
     //对测试数据集使用训练模型进行分类预测
-    val testpredictionAndLabel = testDataRdd.map(p => (model.predict(p.features), p.label))
+    val testpredictionAndLabel = testDataRdd.map(p => {
+      val predict = model.predict(p.features)
+      println(map(p.label.toInt) + "  ==>>  " + map(predict.toInt))
+      (predict, p.label)
+    })
 
     //统计分类准确率
     1.0 * testpredictionAndLabel.filter(x => x._1 == x._2).count() / testDataRdd.count()
@@ -119,9 +123,9 @@ object TextClassifaction {
   def main(args: Array[String]) {
     val spark = SparkSession.builder().appName("TextClassifaction").master("local").getOrCreate()
     val tc = new TextClassifaction
-    val trainData = tc.initDataFromDirectory(spark, "src\\main\\java\\corpus\\segment\\*")
+    val trainData = tc.initDataFromDirectory(spark, "src\\main\\java\\corpus\\classification\\segment\\*")
     val model = tc.buildModel(spark, trainData)
-    val testData = tc.initDataFromFile(spark, "src\\main\\java\\corpus\\test")
+    val testData = tc.initDataFromFile(spark, "src\\main\\java\\corpus\\classification\\test")
     val testaccuracy = tc.testModel(model, spark, testData)
     println(testaccuracy)
   }

@@ -20,6 +20,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   *   （4）runs：跑K-Means算法的次数（K-Means不能保证找到最优解，如果在给定的数据集上运行多次，算法将返回最佳的结果）（This param has no effect since Spark 2.0.0）
   *   （5）initializationSteps：决定了K-Means是否收敛的距离阈值
   *   （6）epsilon：决定了判断K-Means是否收敛的距离阈值
+  *   （7）seed：表示集群初始化时的随机种子
   *
   * k均值算法的计算过程非常直观：
   * 1、从D中随机取k个元素，作为k个簇的各自的中心。

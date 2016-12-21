@@ -13,7 +13,7 @@ import org.apache.spark.sql.SparkSession
   */
 object BinarizerTest {
   def main(args: Array[String]) {
-    val spark = SparkSession.builder().appName("TokenizerTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("BinarizerTest").master("local").getOrCreate()
     val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
     val dataFrame = spark.createDataFrame(data).toDF("label", "feature")
 

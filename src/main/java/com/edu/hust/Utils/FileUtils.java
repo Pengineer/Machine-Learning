@@ -1,6 +1,14 @@
 package com.edu.hust.Utils;
 
 import org.apache.log4j.Logger;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import java.io.*;
 import java.nio.CharBuffer;
@@ -49,6 +57,23 @@ public class FileUtils {
 		} catch (IOException e) {
 			logger.error("IOException", e);
 			e.printStackTrace();
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					logger.error("FileOutputStream close failed.");
+					e.printStackTrace();
+				}
+			}
+			if (osw != null) {
+				try {
+					osw.close();
+				} catch (IOException e) {
+					logger.error("OutputStreamWriter close failed.");
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -75,8 +100,64 @@ public class FileUtils {
 		} catch (IOException e) {
 			logger.error("IOException.", e);
 			e.printStackTrace();
+		} finally {
+			if (inChannel != null) {
+				try {
+					inChannel.close();
+				} catch (IOException e) {
+					logger.error("FileChannel close failed.", e);
+					e.printStackTrace();
+				}
+			}
 		}
 		return "";
+	}
+
+	/**
+	 * 抽取各种类型的文件的内容（txt, word，pdf等）
+	 * @param file
+	 * @param metaInfo  返回内容是否包含元数据信息
+	 * @return
+	 */
+	public static String extractFileContent(File file, Boolean metaInfo) {
+		StringBuffer metaString= new StringBuffer("");
+		Parser parser = new AutoDetectParser();//自动检测文档类型，自动创建相应的解析器
+		InputStream is = null;
+		try {
+			Metadata metadata = new Metadata();
+			metadata.set(Metadata.RESOURCE_NAME_KEY, file.getName());
+			is = new FileInputStream(file);
+			ContentHandler handler = new BodyContentHandler();
+			ParseContext context = new ParseContext();
+			context.set(Parser.class, parser);
+			parser.parse(is, handler, metadata, context);
+			for (String name : metadata.names()) {
+				metaString.append(metadata.get(name) + ",");
+			}
+			if (metaInfo)
+				return metaString.toString() + handler.toString();
+			else
+				return handler.toString();
+		} catch (FileNotFoundException e) {
+			System.out.println(file.getAbsolutePath());
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println(file.getAbsolutePath());
+			e.printStackTrace();
+		} catch (SAXException e) {
+			System.out.println(file.getAbsolutePath());
+			e.printStackTrace();
+		} catch (TikaException e) {
+			System.out.println(file.getAbsolutePath());
+			e.printStackTrace();
+		} finally {
+			try {
+				if(is!=null) is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -93,7 +174,6 @@ public class FileUtils {
 			else
 				list.add(file);
 		}
-
 		return list;
 	}
 }

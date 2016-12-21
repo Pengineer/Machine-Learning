@@ -74,7 +74,7 @@ public class WordsSegmentByIKAnalyzer {
 	public static void main(String[] args) {
 		{
 			WordsSegmentByIKAnalyzer wsbi = new WordsSegmentByIKAnalyzer();
-			String srcDerectory = "src/main/java/corpus/";
+			String srcDerectory = "src/main/java/corpus/classification/";
 
 			String fileName = "transport_0.txt";
 			wsbi.segmentStat(srcDerectory + "/交通214", srcDerectory + "/segment", fileName, 0, true);
