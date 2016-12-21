@@ -8,6 +8,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 /**
@@ -20,21 +21,26 @@ public class WordsSegmentByIKAnalyzer {
 	public static Logger logger = Logger.getLogger(WordsSegmentByIKAnalyzer.class);
 
 	/**
-	 * 获取path目录下文本分类的统计信息
+	 * 获取path目录下所有文本的分词统计信息
 	 * @param srcDirectory
+	 * @param destDirectory
+	 * @param destFileName
+	 * @param category
+	 * @param append
 	 */
-	public static void segmentStat(String srcDirectory, String destDirectory, String destFileName, Integer category) {
+	public static void segmentStat(String srcDirectory, String destDirectory, String destFileName, Integer category, Boolean append) {
 		File fileDir = new File(srcDirectory);
 		if (!fileDir.isDirectory()) {
 			logger.error("Please input a directory path not a file path.");
 			return;
 		}
-		File[] files = fileDir.listFiles();
+		ArrayList<File> files = new ArrayList<>();
+		files = FileUtils.getAllFiles(new File(srcDirectory), files);
 		String lineSeparator = System.getProperty("line.separator", "\n");
 		for (File file : files) {
 			String content = FileUtils.getFileContent(file);
-			String segments = segment(content);
-			FileUtils.writeToFile(destDirectory + destFileName, category + "," + segments + lineSeparator, "UTF-8", true);
+			String segments = segment(content.replaceAll("\\s+", ""));
+			FileUtils.writeToFile(destDirectory + destFileName, category + "," + segments + lineSeparator, "UTF-8", append);
 		}
 	}
 
@@ -71,34 +77,34 @@ public class WordsSegmentByIKAnalyzer {
 			String srcDerectory = "src/main/java/corpus/";
 
 			String fileName = "transport_0.txt";
-			wsbi.segmentStat(srcDerectory + "/交通214", srcDerectory, fileName, 0);
+			wsbi.segmentStat(srcDerectory + "/交通214", srcDerectory + "/segment", fileName, 0, true);
 
 			fileName = "sports_1.txt";
-			wsbi.segmentStat(srcDerectory + "/体育450", srcDerectory, fileName, 1);
+			wsbi.segmentStat(srcDerectory + "/体育450", srcDerectory + "/segment", fileName, 1, true);
 
 			fileName = "military_2.txt";
-			wsbi.segmentStat(srcDerectory + "/军事249", srcDerectory, fileName, 2);
+			wsbi.segmentStat(srcDerectory + "/军事249", srcDerectory + "/segment", fileName, 2, true);
 
 			fileName = "medicine_3.txt";
-			wsbi.segmentStat(srcDerectory + "/医药204", srcDerectory, fileName, 3);
+			wsbi.segmentStat(srcDerectory + "/医药204", srcDerectory + "/segment", fileName, 3, true);
 
 			fileName = "politics_4.txt";
-			wsbi.segmentStat(srcDerectory + "/政治505", srcDerectory, fileName, 4);
+			wsbi.segmentStat(srcDerectory + "/政治505", srcDerectory + "/segment", fileName, 4, true);
 
 			fileName = "education_5.txt";
-			wsbi.segmentStat(srcDerectory + "/教育220", srcDerectory, fileName, 5);
+			wsbi.segmentStat(srcDerectory + "/教育220", srcDerectory + "/segment", fileName, 5, true);
 
 			fileName = "environment_6.txt";
-			wsbi.segmentStat(srcDerectory + "/环境200", srcDerectory, fileName, 6);
+			wsbi.segmentStat(srcDerectory + "/环境200", srcDerectory + "/segment", fileName, 6, true);
 
 			fileName = "economic_7.txt";
-			wsbi.segmentStat(srcDerectory + "/经济325", srcDerectory, fileName, 7);
+			wsbi.segmentStat(srcDerectory + "/经济325", srcDerectory + "/segment", fileName, 7, true);
 
 			fileName = "arts_8.txt";
-			wsbi.segmentStat(srcDerectory + "/艺术248", srcDerectory, fileName, 8);
+			wsbi.segmentStat(srcDerectory + "/艺术248", srcDerectory + "/segment", fileName, 8, true);
 
 			fileName = "compute_9.txt";
-			wsbi.segmentStat(srcDerectory + "/计算机200", srcDerectory, fileName, 9);
+			wsbi.segmentStat(srcDerectory + "/计算机200", srcDerectory + "/segment", fileName, 9, true);
 		}
 	}
 

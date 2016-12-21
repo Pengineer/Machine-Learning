@@ -15,8 +15,12 @@ import static org.apache.hadoop.yarn.webapp.hamlet.HamletSpec.InputType.file;
  *
  * Created by liangjian on 2016/12/19.
  */
-public class SimpleTest {
+public class JavaSimpleTest {
 	public static void main(String[] args) {
+		System.out.println("fjd fds fd   fd  ".replaceAll("\\s+", ""));
+	}
+
+	public static void convert() {
 		File dir = new File("C:\\D\\document\\毕设\\others\\语料库\\文本分类语料库\\艺术248");
 		File[] files = dir.listFiles();
 		for (File file : files) {
@@ -46,8 +50,6 @@ public class SimpleTest {
 				e.printStackTrace();
 			}
 		}
-
 	}
-
 
 }

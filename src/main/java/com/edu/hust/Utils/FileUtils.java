@@ -8,6 +8,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.ArrayList;
 
 
 /**
@@ -76,5 +77,23 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	/**
+	 * 获取指定路径下面的所有文件，包括子文件夹下的文件
+	 * @param dir
+	 * @param list
+	 * @return
+	 */
+	public static ArrayList<File> getAllFiles(File dir, ArrayList<File> list) {
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isDirectory())
+				getAllFiles(file, list);
+			else
+				list.add(file);
+		}
+
+		return list;
 	}
 }

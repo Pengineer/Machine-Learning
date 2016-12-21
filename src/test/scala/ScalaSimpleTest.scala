@@ -1,17 +1,12 @@
-package com.edu.hust.sparkAPI
-
-import java.io.{File, FileInputStream, FileOutputStream, OutputStreamWriter}
-import java.nio.{CharBuffer, MappedByteBuffer}
+import java.io.{FileInputStream, FileOutputStream, OutputStreamWriter}
 import java.nio.channels.FileChannel
 import java.nio.charset.{Charset, CharsetDecoder}
-
-import scala.collection.mutable
-import scala.io.{Codec, Source}
+import java.nio.{CharBuffer, MappedByteBuffer}
 
 /**
   * Created by liangjian on 2016/12/16.
   */
-object SimpleTest {
+object ScalaSimpleTest {
   def main(args: Array[String]) {
 //    val m = mutable.HashMap("a" -> 1, "b" -> 2)
 //    println(m.values.mkString)
@@ -32,7 +27,11 @@ object SimpleTest {
 //    val lines = source.getLines.toArray                       // 将行放到数组或则数据缓冲中
 //    val contents = source.mkString                           // 将整个文件读成一个字符串
 
-
+    val arr1 = Array(1,2,3)
+    val arr2 = Array('a','b','c')
+    var arr3:Array[Tuple2[Int, Char]] = arr1.zip(arr2)
+    arr3 = arr3.sortBy(x => -x._2)
+    arr3.foreach {case (i:Int, c:Char) => println(i + ":" + c)}
 
   }
 
