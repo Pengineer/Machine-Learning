@@ -21,14 +21,14 @@ public class WordsSegmentByIKAnalyzer {
 	public static Logger logger = Logger.getLogger(WordsSegmentByIKAnalyzer.class);
 
 	/**
-	 * 获取path目录下所有文本的分词统计信息
+	 * 获取path目录下所有文本的分词统计信息，并输出到指定文件
 	 * @param srcDirectory
 	 * @param destDirectory
 	 * @param destFileName
 	 * @param category
 	 * @param append
 	 */
-	public static void segmentStat(String srcDirectory, String destDirectory, String destFileName, Integer category, Boolean append) {
+	public void segmentStat(String srcDirectory, String destDirectory, String destFileName, Integer category, Boolean append) {
 		File fileDir = new File(srcDirectory);
 		if (!fileDir.isDirectory()) {
 			logger.error("Please input a directory path not a file path.");
@@ -49,7 +49,7 @@ public class WordsSegmentByIKAnalyzer {
 	 * @param text
 	 * @return
 	 */
-	public static String segment(String text) {
+	public String segment(String text) {
 		Analyzer analyzer = new IKAnalyzer(true);
 		StringReader reader = new StringReader(text);
 		TokenStream ts = null;

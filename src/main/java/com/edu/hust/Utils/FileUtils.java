@@ -114,12 +114,12 @@ public class FileUtils {
 	}
 
 	/**
-	 * 抽取各种类型的文件的内容（txt, word，pdf等）
+	 * 解析各种类型的文件的内容（txt, word，pdf等）
 	 * @param file
 	 * @param metaInfo  返回内容是否包含元数据信息
 	 * @return
 	 */
-	public static String extractFileContent(File file, Boolean metaInfo) {
+	public static String parseFileContent(File file, Boolean metaInfo) {
 		StringBuffer metaString= new StringBuffer("");
 		Parser parser = new AutoDetectParser();//自动检测文档类型，自动创建相应的解析器
 		InputStream is = null;

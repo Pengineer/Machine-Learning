@@ -73,7 +73,7 @@ class TextClassifaction extends Serializable {
 
     //转换成Bayes的输入格式
     import spark.implicits._
-    val trainDataRdd = rescaledData.select($"category",$"features").rdd.map {
+    val trainDataRdd = rescaledData.select($"label",$"features").rdd.map {
       x =>
        LabeledPoint(x.getString(0).toDouble, Vectors.dense(x.getAs[SparseVector](1).toArray))
     }
@@ -102,7 +102,7 @@ class TextClassifaction extends Serializable {
     val testrescaledData = idfModel.transform(testfeaturizedData)
 
     import spark.implicits._
-    val testDataRdd = testrescaledData.select($"category",$"features").rdd.map {
+    val testDataRdd = testrescaledData.select($"label",$"features").rdd.map {
       x =>
         LabeledPoint(x.getString(0).toDouble, Vectors.dense(x.getAs[SparseVector](1).toArray))
     }
