@@ -8,7 +8,7 @@ import org.apache.spark.ml.linalg.SparseVector
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql._
-import com.edu.hust.MLlib.Utils.FileUtils
+import com.edu.hust.MLlib.Utils.{CommonUtils, FileUtils}
 import com.edu.hust.Tika.ApplicationFileProcess
 import com.edu.hust.Utils.StringUtils
 import org.apache.spark.SparkException
@@ -66,6 +66,7 @@ class TextCluster {
 
   /**
     * 计算各词的TF-IDF值
+    *
     * @param spark
     * @param trainData
     * @return
@@ -89,9 +90,11 @@ class TextCluster {
     * 模型训练
     * @param spark
     * @param rescaledData
+    * @param clusterNum
+    * @param maxItetations
     * @return
     */
-  def buildModel(spark:SparkSession, rescaledData:DataFrame):KMeansModel = {
+  def buildModel(spark:SparkSession, rescaledData:DataFrame, clusterNum:Int, maxItetations:Int):KMeansModel = {
     //转换成Kmeans的输入格式
     import spark.implicits._
     val trainDataRdd = rescaledData.select($"features").rdd.map {
@@ -99,13 +102,12 @@ class TextCluster {
         Vectors.dense(x.getAs[SparseVector](0).toArray)
     }
 
-    val k:Int = 10
-    val maxItetations:Int = 20
-    KMeans.train(trainDataRdd, k, maxItetations, 1, KMeans.K_MEANS_PARALLEL)
+    KMeans.train(trainDataRdd, clusterNum, maxItetations, 1, KMeans.K_MEANS_PARALLEL)
   }
 
   /**
     * 使用误差平方之和来评估数据模型
+    *
     * @param spark
     * @param model
     * @param rescaledData
@@ -119,6 +121,26 @@ class TextCluster {
     }
     val WSSSE = model.computeCost(trainDataRdd)
     WSSSE
+  }
+
+  /**
+    * 根据训练模型给所有原始文本做类型打标
+    * @param model
+    * @param rescaledData
+    */
+  def markAndClassify(spark:SparkSession, model: KMeansModel, rescaledData:DataFrame):Map[String, Int] = {
+    val originTrainData = rescaledData.select("fileName", "features")
+    import spark.implicits._
+    //TODO 作为后期性能优化，此处的map建议修改为mapPartition
+    val rdd = originTrainData.map { case row:Row =>
+      val cluster = model.predict(Vectors.dense(row.getAs[SparseVector](1).toArray))
+      (row.getAs[String]("fileName"), cluster)
+    }
+    var map = Map[String, Int]()
+    rdd.collect().foreach { case (x:String, y:Int) =>
+      map += (x -> y)
+    }
+    map
   }
 }
 
@@ -134,9 +156,11 @@ object TextCluster {
         s"Input Directory not exists or is empty for the ${this.getClass.getSimpleName}"
       )
     }
+    // 计算TF-IDF值
     val rescaledData = tc.tfidf(spark, data)
 
-    val model = tc.buildModel(spark, rescaledData)
+    // 模型训练
+    val model = tc.buildModel(spark, rescaledData, 20, 20)
     var clusterIndex:Int = 0
     println("Cluster Number:" + model.clusterCenters.length)
     println("Cluster Centers Information Overview:")
@@ -146,12 +170,13 @@ object TextCluster {
         clusterIndex += 1
       })
 
-
+    // 数据打标分类
+    val map:Map[String, Int] = tc.markAndClassify(spark, model, rescaledData)
+    println(map.size)
+    CommonUtils.printSortValues(map).foreach(println(_))
 
 //    val WSSSE = tc.computeCost(spark, model, rescaledData)
 //    println(WSSSE)
-
-
-//    spark.stop()
+    spark.stop()
   }
 }
