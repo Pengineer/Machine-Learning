@@ -27,14 +27,16 @@ object ScalaSimpleTest {
 //    val lines = source.getLines.toArray                       // 将行放到数组或则数据缓冲中
 //    val contents = source.mkString                           // 将整个文件读成一个字符串
 
-//    val arr1 = Array(1,2,3)
+    val arr1 = Array(1,2,3)
 //    val arr2 = Array('a','b','c')
 //    var arr3:Array[Tuple2[Int, Char]] = arr1.zip(arr2)
 //    arr3 = arr3.sortBy(x => -x._2)
 //    arr3.foreach {case (i:Int, c:Char) => println(i + ":" + c)}
 
-    val file = new File("C:\\D\\document\\graduation_design\\others\\cluster_part")
-    println(file.listFiles().length)
+//    val file = new File("C:\\D\\document\\graduation_design\\others\\cluster_part")
+//    println(file.listFiles().length)
+
+    for (i <- 0 until arr1.length) println(i)
 
   }
 
