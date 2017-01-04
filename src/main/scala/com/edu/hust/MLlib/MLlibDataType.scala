@@ -38,7 +38,7 @@ object MLlibDataType {
     val sv1:Vector = Vectors.sparse(3, Array(0,2), Array(1.0,3.0))
 
     /*以序列的方式创建稀疏向量（只列出非零条目）*/
-    val sv2:Vector = Vectors.sparse(3, Seq((0,1.0), (2,3.0)))
+    val sv2 = Vectors.sparse(3, Seq((0,1.0), (2,3.0)))
 
     /******************************************/
 
@@ -52,5 +52,8 @@ object MLlibDataType {
 
     /*创建一个本地矩阵*/
     val dm:Matrix = Matrices.dense(3, 2, Array(1.0, 3.0, 5.0, 2.0, 4.0, 6.0))
+
+    /******************************************/
+
   }
 }

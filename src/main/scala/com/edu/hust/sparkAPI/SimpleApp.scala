@@ -65,7 +65,7 @@ object SimpleApp {
     * RDD的所有转换操作都是lazy模式，即Spark不会立刻计算结果，而只是简单的记住所有对数据集的转换操作。这些转换只有遇到action操作的时候才会开始计算。这样的设计使得Spark
     * 更加的高效，例如，对一个输入数据做一次map操作后进行reduce操作，只有reduce的结果返回给driver，而不是把数据量更大的map操作后的数据集传递给driver。
     *
-    * 转换操作分为两类，一类是对Value型数据进行的操作，一类是对Key-Value类型进行的操作。
+    * 转换操作分      为两类，一类是对Value型数据进行的操作，一类是对Key-Value类型进行的操作。
     * Transformations
       1，对value型数据转换操作（https://www.zybuluo.com/jewes/note/35032）
       Transformation	                          Meaning

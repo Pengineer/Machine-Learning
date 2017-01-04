@@ -12,6 +12,7 @@ import com.edu.hust.MLlib.Utils.{CommonUtils, FileUtils}
 import com.edu.hust.Tika.ApplicationFileProcess
 import com.edu.hust.Utils.StringUtils
 import org.apache.spark.SparkException
+import org.apache.spark.rdd.RDD
 
 /**
   * Created by liangjian on 2016/12/22.
@@ -96,7 +97,7 @@ class TextCluster {
     */
   def buildModel(spark:SparkSession, rescaledData:DataFrame, clusterNum:Int, maxItetations:Int):KMeansModel = {
     //转换成Kmeans的输入格式
-    import spark.implicits._
+    import spark.implicits._  // 这个包用于将RDD隐式转化为DataFrame
     val trainDataRdd = rescaledData.select($"features").rdd.map {
       x =>
         Vectors.dense(x.getAs[SparseVector](0).toArray)
@@ -130,12 +131,16 @@ class TextCluster {
     */
   def markAndClassify(spark:SparkSession, model: KMeansModel, rescaledData:DataFrame):Map[String, Int] = {
     val originTrainData = rescaledData.select("fileName", "features")
-    import spark.implicits._
-    //TODO 作为后期性能优化，此处的map建议修改为mapPartition
-    val rdd = originTrainData.map { case row:Row =>
-      val cluster = model.predict(Vectors.dense(row.getAs[SparseVector](1).toArray))
-      (row.getAs[String]("fileName"), cluster)
+    val rdd:RDD[(String, Int)] = originTrainData.rdd.mapPartitions { iteratorRow =>
+      var map:Map[String, Int] = Map[String, Int]()
+      while (iteratorRow.hasNext) {
+        val tempRow = iteratorRow.next
+        val cluster = model.predict(Vectors.dense(tempRow.getAs[SparseVector](1).toArray))
+        map += (tempRow.getAs[String](0) -> cluster)
+      }
+      map.iterator
     }
+
     var map = Map[String, Int]()
     rdd.collect().foreach { case (x:String, y:Int) =>
       map += (x -> y)
