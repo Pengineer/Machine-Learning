@@ -139,16 +139,16 @@ public class FileUtils {
 			else
 				return handler.toString();
 		} catch (FileNotFoundException e) {
-			System.out.println(file.getAbsolutePath());
+			System.out.println("1 - " + file.getAbsolutePath());
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println(file.getAbsolutePath());
+			System.out.println("2 - " + file.getAbsolutePath());
 			e.printStackTrace();
 		} catch (SAXException e) {
-			System.out.println(file.getAbsolutePath());
+			System.out.println("3 - " + file.getAbsolutePath());
 			e.printStackTrace();
 		} catch (TikaException e) {
-			System.out.println(file.getAbsolutePath());
+			System.out.println("4 - " + file.getAbsolutePath());
 			e.printStackTrace();
 		} finally {
 			try {
@@ -157,7 +157,7 @@ public class FileUtils {
 				e.printStackTrace();
 			}
 		}
-		return null;
+		return ""; // 异常返回
 	}
 
 	/**

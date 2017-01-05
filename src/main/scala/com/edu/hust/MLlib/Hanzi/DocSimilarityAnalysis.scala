@@ -21,16 +21,18 @@ import org.apache.spark.sql._
   * Created by pengliang on 2017/1/3.
   */
 class DocSimilarityAnalysis {
+
   /**
     * 初始化指定目录下的文本数据
     *
     * @param spark
-    * @param path
+    * @param srcFile  待分析文档
+    * @param path     文档集目录
     * @param start
     * @param end
     * @return
     */
-  def initDataFromDirectory(spark:SparkSession, path:String, start:String, end:String):Option[DataFrame] = {
+  def initDataFromDirectory(spark:SparkSession, srcFile:File, path:String, start:String, end:String):Option[DataFrame] = {
     val sc = spark.sparkContext
     import spark.implicits._
     val afp = new ApplicationFileProcess
@@ -46,30 +48,36 @@ class DocSimilarityAnalysis {
     if (fileList.isEmpty)
       None
     else {
-      val contents = fileList.map { file =>
-        val content = afp.extractFileContent(file, start, end)
+      var contents = fileList.map { file =>
+        val content = afp.extractFileContent(file, start, end, 0)
         RawDataRecord(file.getName, ws.segment(StringUtils.chineseCharacterFix(content)))  // 文件名，文件内容
       }
+      contents = contents.+:(RawDataRecord(srcFile.hashCode().toString, ws.segment(StringUtils.chineseCharacterFix(afp.extractFileContent(srcFile,start,end)))))
       Some(sc.parallelize(contents).toDF("fileName", "content").cache())
     }
   }
 
   /**
-    * 初始化指定文件中的文本数据
+    * 初始化指定文件中指定范围的文本数据
     *
     * @param spark
     * @param file
     * @return
     */
-  def initDataFromFile(spark:SparkSession, file:String):DataFrame = {
+  def initDataFromFile(spark:SparkSession, file:File, start:String, end:String):DataFrame = {
     val sc = spark.sparkContext
     import spark.implicits._
-    sc.textFile(file).toDF("content")
+    val afp = new ApplicationFileProcess
+    val ws = new WordsSegmentByIKAnalyzer
+    val content = afp.extractFileContent(file, start, end)
+    val segContent = ws.segment(StringUtils.chineseCharacterFix(content))
+    sc.parallelize(Array(segContent)).toDF("content")
   }
 
   /**
     * 计算各词的TF-IDF值
     *
+    * Note  计算单个文件的TF-IDF值无效，必须放到文档集中计算
     * @param spark
     * @param trainData
     * @return
@@ -89,22 +97,23 @@ class DocSimilarityAnalysis {
     idfModel.transform(featurizedData)
   }
 
-  //  val rescaledData_b = spark.sparkContext.broadcast(dataSet.collect())
-  //    //转换成Kmeans的输入格式
-  //    import spark.implicits._
-  //    val vectorSet = dataSet.select($"fileName", $"features").rdd.map {
-  //        x =>
-  //          val fileName = x.getAs[String](0)
-  //          val vector = x.getAs[SparseVector](1)
-  //          vector
-  ////          val dot = BLAS.dot(srcVector, vector)
-  //    }
-
-   def docSimi(spark:SparkSession, srcData:DataFrame, dataSet:DataFrame) = {
+  /**
+    * 文档余弦相似度计算
+    *
+    * @param spark
+    * @param srcFile   给定文档数据
+    * @param dataSet   给定文档集数据
+    * @return
+    */
+   def docSimi(spark:SparkSession, srcFile:File, dataSet:DataFrame) = {
      import spark.implicits._
-     val srcVector = srcData.select($"features").first().getAs[SV](0)
-     import breeze.linalg.{SparseVector => BreezeSparseVector,norm}
-     val bsv1 = new BreezeSparseVector[Double](srcVector.indices, srcVector.values, srcVector.size)
+     val srcVector =  dataSet.select($"fileName", $"features").filter { row =>
+        row.getAs[String](0).equals(srcFile.hashCode().toString)
+     }.first().getAs[SV](1)
+     val srcVector_b = spark.sparkContext.broadcast(srcVector)
+
+     import breeze.linalg.{SparseVector => BreezeSparseVector, norm}
+     val bsv1 = new BreezeSparseVector[Double](srcVector_b.value.indices, srcVector_b.value.values, srcVector_b.value.size)
      val res = dataSet.select($"fileName", $"features").map { ele =>
        val fileName = ele.getAs[String](0)
        val vector = ele.getAs[SV](1)
@@ -112,7 +121,7 @@ class DocSimilarityAnalysis {
        val cosSim = bsv1.dot(bsv2) / (norm(bsv1) * norm(bsv2))
        (fileName, cosSim)
      }
-     res.collect().sortBy(x => (x._2,x._1)).reverse
+     res.collect().sortBy(x => (x._2,x._1)).reverse.tail
   }
 }
 
@@ -122,18 +131,20 @@ object DocSimilarityAnalysis {
     val dsa = new DocSimilarityAnalysis
     val start = "一、本课题研究的理论和实际应用价值，目前国内外研究的现状和趋势（限2页，不能加页）"
     val end = "三、本课题的研究思路和研究方法、计划进度、前期研究基础及资料准备情况（限2页，不能加页）"
-    val trainData = dsa.initDataFromDirectory(spark, "C:\\D\\document\\graduation_design\\others\\cluster_part\\", start, end)
+    val docLibPath = "C:\\D\\document\\graduation_design\\others\\cluster_part\\"
+    val srcFile = new File("C:\\D\\document\\graduation_design\\others\\general_app_2009_10762_20090603205322796.doc")
+    val trainData = dsa.initDataFromDirectory(spark, srcFile, docLibPath, start, end)
     val data = trainData.getOrElse {
       throw new SparkException(
         s"Input Directory not exists or is empty for the ${this.getClass.getSimpleName}"
       )
     }
+
     // 计算TF-IDF值
     val rescaledData = dsa.tfidf(spark, data)
 
-    val res = dsa.docSimi(spark, rescaledData, rescaledData)
-    res.foreach(println(_))
+    val res = dsa.docSimi(spark, srcFile, rescaledData)
+    res.take(10).foreach(println(_))
   }
-
 
 }

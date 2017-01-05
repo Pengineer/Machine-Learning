@@ -23,13 +23,48 @@ public class ApplicationFileProcess {
      * @return
      */
     public String extractFileContent(File file, String start, String end) {
-        String text = FileUtils.parseFileContent(file, false);
-        text = StringUtils.deleteCRLF(text);
-        return text.substring(text.indexOf(start) + start.length(), text.indexOf(end));
+        try {
+            String text = FileUtils.parseFileContent(file, false);
+            text = StringUtils.deleteCRLF(text);
+            return text.substring(text.indexOf(start) + start.length(), text.indexOf(end));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * 抽取申报书信息
+     * @param file
+     * @param start
+     * @param end
+     * @type
+     * @return
+     */
+    public String extractFileContent(File file, String start, String end, Integer type) {
+        try{
+            String text = FileUtils.parseFileContent(file, false);
+            text = StringUtils.deleteCRLF(text);
+            if (text.contains(start) && text.contains(end)) {
+                type = 0;
+            } else if (!text.contains(start) && text.contains(end)) {
+                type = 1;
+            } else if (text.contains(start) && !text.contains(end)) {
+                type = 2;
+            } else {
+                type = 3;
+            }
+            switch (type) {
+                case 0 : return text.substring(text.indexOf(start) + start.length(), text.indexOf(end));  // 规则：必须包含start和end，否则返回空串（可修改）
+                default : return "";
+            }
+        } catch (Exception e) {
+            return "";
+        }
+
     }
 
     public static void main(String[] args) {
-        String path = "C:\\D\\document\\graduation design\\others\\cluster_part\\general_app_2009_10001_20090519232211667.doc";
+        String path = "C:\\D\\document\\graduation_design\\others\\cluster_part\\general_app_2009_10592_20090601214441937.doc";
         String start = "一、本课题研究的理论和实际应用价值，目前国内外研究的现状和趋势（限2页，不能加页）";
         String end = "三、本课题的研究思路和研究方法、计划进度、前期研究基础及资料准备情况（限2页，不能加页）";
 

@@ -29,7 +29,11 @@ trait Spark2BreezeConverter[I <: SparkVector, O <: BreezeVector[Double]] {
   def convert(sparkVector: I): O
 }
 
+/**
+  * Spark2Breeze转换工具
+  */
 object Spark2BreezeConverter {
+
   implicit val denseSpark2DenseBreezeConverter = new Spark2BreezeConverter[DenseSparkVector, DenseBreezeVector[Double]] {
     override def convert(sparkVector: DenseSparkVector): DenseBreezeVector[Double] = {
       new DenseBreezeVector[Double](sparkVector.values)
@@ -56,6 +60,9 @@ trait Breeze2SparkConverter[I <: BreezeVector[Double], O <: SparkVector] {
   def convert(breezeVector: I): O
 }
 
+/**
+  * Breeze2Spark转换工具
+  */
 object Breeze2SparkConverter {
   implicit val denseBreeze2DenseSparkVector = new Breeze2SparkConverter[DenseBreezeVector[Double], DenseSparkVector] {
     override def convert(breezeVector: DenseBreezeVector[Double]): DenseSparkVector = {
