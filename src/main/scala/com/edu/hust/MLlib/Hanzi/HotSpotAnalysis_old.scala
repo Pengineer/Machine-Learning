@@ -16,7 +16,7 @@ import org.apache.spark.sql._
   * 热点分析
   * Created by liangjian on 2016/12/23.
   */
-class HotSpotAnalysis {
+class HotSpotAnalysis_old {
   /**
     * 初始化指定目录下的文本数据
     *
@@ -81,7 +81,7 @@ class HotSpotAnalysis {
         case (key:String, value:Double) => if(map.contains(key)) map+=(key -> (value+map(key))) else map+=(key -> value)
       }
     }
-    CommonUtils.printSortValues(map)
+    CommonUtils.sortByValues(map)
   }
 
   /**
@@ -101,10 +101,10 @@ class HotSpotAnalysis {
   }
 }
 
-object HotSpotAnalysis {
+object HotSpotAnalysis_old {
   def main(args: Array[String]) {
-    val spark = SparkSession.builder().appName("TextCluster").master("local").getOrCreate()
-    val hotspot = new HotSpotAnalysis
+    val spark = SparkSession.builder().appName("HotSpotAnalyzer").master("local").getOrCreate()
+    val hotspot = new HotSpotAnalysis_old
     val start = "一、本课题研究的理论和实际应用价值，目前国内外研究的现状和趋势（限2页，不能加页）"
     val end = "三、本课题的研究思路和研究方法、计划进度、前期研究基础及资料准备情况（限2页，不能加页）"
     val trainData = hotspot.initDataFromDirectory(spark, "C:\\D\\document\\graduation_design\\others\\cluster_part\\", start, end)

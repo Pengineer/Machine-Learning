@@ -178,7 +178,7 @@ object TextCluster {
     // 数据打标分类
     val map:Map[String, Int] = tc.markAndClassify(spark, model, rescaledData)
     println(map.size)
-    CommonUtils.printSortValues(map).foreach(println(_))
+    CommonUtils.sortByValues(map).foreach(println(_))
 
 //    val WSSSE = tc.computeCost(spark, model, rescaledData)
 //    println(WSSSE)

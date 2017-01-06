@@ -89,13 +89,13 @@ object MLlibAlgorithm_CF {
     总结一下Spark中各个角色的JVM参数设置：
     (1)Driver的JVM参数：
        -Xmx，-Xms，如果是yarn-client模式，则默认读取spark-env文件中的SPARK_DRIVER_MEMORY值，-Xmx，-Xms值一样大小；如果是yarn- cluster模式，则读取的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的JVM 参数值。
-PermSize，如果是yarn-client模式，则 是默认读取spark-class文件中的JAVA_OPTS="-XX:MaxPermSize=256m $OUR_JAVA_OPTS"值；如果是yarn-cluster模式，读取的是spark-default.conf文件中的 spark.driver.extraJavaOptions对应的JVM参数值。
-GC 方式，如果是yarn-client模式，默认读取的是spark-class文件中的JAVA_OPTS；如果是yarn-cluster模式，则读取 的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的参数值。
-以上值最后均可被spark-submit工具中的--driver-java-options参数覆盖。
+       PermSize，如果是yarn-client模式，则 是默认读取spark-class文件中的JAVA_OPTS="-XX:MaxPermSize=256m $OUR_JAVA_OPTS"值；如果是yarn-cluster模式，读取的是spark-default.conf文件中的 spark.driver.extraJavaOptions对应的JVM参数值。
+       GC 方式，如果是yarn-client模式，默认读取的是spark-class文件中的JAVA_OPTS；如果是yarn-cluster模式，则读取 的是spark-default.conf文件中的spark.driver.extraJavaOptions对应的参数值。
+    以上值最后均可被spark-submit工具中的--driver-java-options参数覆盖。
     (2)Executor的JVM参数：
        -Xmx，-Xms，如果是 yarn-client模式，则默认读取spark-env文件中的SPARK_EXECUTOR_MEMORY值，-Xmx，-Xms值一样大小；如果 是yarn-cluster模式，则读取的是spark-default.conf文件中的 spark.executor.extraJavaOptions对应的JVM参数值。
-PermSize，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。
-GC方式，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。
+       PermSize，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。
+       GC方式，两种模式都是读取的是spark-default.conf文件中的spark.executor.extraJavaOptions对应的JVM参数值。
     (3)Executor数目及所占CPU个数
       如果是yarn-client模式，Executor数目由spark-env中的SPARK_EXECUTOR_INSTANCES指定，每个实例的数目由SPARK_EXECUTOR_CORES指定；如果是yarn-cluster模式，Executor的数目由spark-submit工具的--num-executors参数指定，默认是2个实例，而每个Executor使用的CPU数目由--executor-cores指定，默认为1核。
     */

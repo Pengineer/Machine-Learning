@@ -5,10 +5,12 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.wltea.analyzer.core.IKSegmenter;
+import org.wltea.analyzer.core.Lexeme;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 
 /**
@@ -45,7 +47,7 @@ public class WordsSegmentByIKAnalyzer {
 	}
 
 	/**
-	 * 文本分词
+	 * 文本分词  分词结果以空格隔开
 	 * @param text
 	 * @return
 	 */
@@ -69,6 +71,64 @@ public class WordsSegmentByIKAnalyzer {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	/**
+	 * 文本分词，并统计好每个词的频率，分词结果以Map形式返回，键是词，值是词频
+	 * @param text		待分词的文本
+	 * @param useSmart	是否开启智能模式，不开启就按最小词义分
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, Integer> getWordsFreq(String text, boolean useSmart) throws IOException {
+		System.out.println(text);
+		// 词频记录，将分词结果和出现次数放到一个map结构中，map的value对应了词的出现次数。
+		Map<String, Integer> wordsFreq = new HashMap<String, Integer>();
+		// IKSegmenter是分词的主要类
+		IKSegmenter ikSegmenter = new IKSegmenter(new StringReader(text), useSmart);
+		// Lexeme是分词的结果类，getLexemeText()方法就能取出相关的分词结果
+		Lexeme lexeme = null;
+		// 统计词频
+		while ((lexeme = ikSegmenter.next()) != null) {
+			if (lexeme.getLexemeText().length() > 4) {
+				if (wordsFreq.containsKey(lexeme.getLexemeText())) {
+					wordsFreq.put(lexeme.getLexemeText(), wordsFreq.get(lexeme.getLexemeText()) + 1);
+				} else {
+					wordsFreq.put(lexeme.getLexemeText(), 1);
+				}
+			}
+		}
+		return wordsFreq;
+	}
+
+	/**
+	 * 获取Top K 分词结果
+	 * @param text		待分词的文本
+	 * @param k			前K条记录
+	 * @param useSmart	是否开启智能模式，不开启就按最小词义分
+	 * @return
+	 */
+	@Deprecated
+	public static List<Map.Entry<String, Integer>> getTopKResult(String text, int k, boolean useSmart){
+		Map<String, Integer> wordsFreq = null;
+		try {
+			wordsFreq = getWordsFreq(text, useSmart);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 按照词频进行排序
+		List<Map.Entry<String, Integer>> wordsFreqList = new ArrayList<Map.Entry<String, Integer>>(wordsFreq.entrySet());
+		Collections.sort(wordsFreqList, new Comparator<Map.Entry<String, Integer>>() {
+			public int compare(Map.Entry<String, Integer> entry1, Map.Entry<String, Integer> entry2) {
+				return entry2.getValue() - entry1.getValue();
+			}
+		});
+		if (wordsFreqList.size() > k) {
+			return wordsFreqList.subList(0, k);
+		}else {
+			return wordsFreqList;
+		}
 	}
 
 	public static void main(String[] args) {
