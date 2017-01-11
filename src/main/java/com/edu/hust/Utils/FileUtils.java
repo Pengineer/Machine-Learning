@@ -17,6 +17,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -166,6 +167,7 @@ public class FileUtils {
 	 * @param list
 	 * @return
 	 */
+	@Deprecated
 	public static ArrayList<File> getAllFiles(File dir, ArrayList<File> list) {
 		File[] files = dir.listFiles();
 		for (File file : files) {
@@ -175,5 +177,21 @@ public class FileUtils {
 				list.add(file);
 		}
 		return list;
+	}
+
+	/**
+	 * 获取指定路径下面的所有文件，包括子文件夹下的文件
+	 * @param dir
+	 * @param list
+	 * @return
+	 */
+	public static void getAllFiles(File dir, List<File> list) {
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isDirectory())
+				getAllFiles(file, list);
+			else
+				list.add(file);
+		}
 	}
 }
