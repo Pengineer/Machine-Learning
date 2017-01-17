@@ -18,7 +18,9 @@ import java.util.*;
  *
  * Created by liangjian on 2016/12/20.
  */
-public class WordsSegmentByIKAnalyzer {
+public class WordsSegmentByIKAnalyzer implements Serializable {
+
+	private static final long serialVersionUID = 7070205646027378059L;
 
 	public static Logger logger = Logger.getLogger(WordsSegmentByIKAnalyzer.class);
 
@@ -52,6 +54,7 @@ public class WordsSegmentByIKAnalyzer {
 	 * @return
 	 */
 	public String segment(String text) {
+		if(text == null) text = "";  // 这里就不做异常的捕获了，请在调用该方法时，如果有必要强调text不为null，请自行判断
 		Analyzer analyzer = new IKAnalyzer(true);
 		StringReader reader = new StringReader(text);
 		TokenStream ts = null;
@@ -74,6 +77,16 @@ public class WordsSegmentByIKAnalyzer {
 	}
 
 	/**
+	 * 文本分词  分词结果以字符串数组返回
+	 * @param text
+	 * @return
+	 */
+	public String[] segmentToArray(String text) {
+		String segText = segment(text);
+		return segText.split(" ");
+	}
+
+	/**
 	 * 文本分词，并统计好每个词的频率，分词结果以Map形式返回，键是词，值是词频
 	 * @param text		待分词的文本
 	 * @param useSmart	是否开启智能模式，不开启就按最小词义分
@@ -82,6 +95,7 @@ public class WordsSegmentByIKAnalyzer {
 	 */
 	public static Map<String, Integer> getWordsFreq(String text, boolean useSmart) throws IOException {
 		System.out.println(text);
+		if(text == null) text = "";
 		// 词频记录，将分词结果和出现次数放到一个map结构中，map的value对应了词的出现次数。
 		Map<String, Integer> wordsFreq = new HashMap<String, Integer>();
 		// IKSegmenter是分词的主要类

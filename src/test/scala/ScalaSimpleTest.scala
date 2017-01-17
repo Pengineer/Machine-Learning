@@ -36,8 +36,23 @@ object ScalaSimpleTest {
 //    val file = new File("C:\\D\\document\\graduation_design\\others\\cluster_part")
 //    println(file.listFiles().length)
 
-    for (i <- 0 until arr1.length) println(i)
+//    for (i <- 0 until arr1.length) println(i)
+    sort
+  }
 
+  // Array.sortBy 排序
+  def sort() = {
+    var c = Array(("general_app_2009_11065_20090521163711120.doc", 0.75, 0.21, 0.48),
+                  ("general_app_2009_10833_20090605174441312.doc", 0.75, 0.21, 0.58),
+                  ("general_app_2009_10831_20090601102728988.doc", 0.75, 0.22, 0.48),
+                  ("general_app_2009_10819_20090601225333968.doc", 0.75, 0.22, 0.38),
+                  ("general_app_2009_10809_20090602103658890.doc", 0.55, 0.21, 0.48),
+                  ("general_app_2009_10809_20090602103658891.doc", 0.55, 0.23, 0.48),
+                  ("general_app_2009_10809_20090602103258893.doc", 0.58, 0.23, 0.48))
+    c.foreach(println(_))
+    println("-----------")
+    c = c.sortBy(x => (x._4,x._2,x._3)).reverse   // 先按照第4列排序，再按照第2列排序，最后按照第3列排序
+    c.foreach(println(_))
   }
 
   // 文本内容格式转换

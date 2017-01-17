@@ -60,20 +60,37 @@ public class ApplicationFileProcess {
         } catch (Exception e) {
             return "";
         }
+    }
 
+    /**
+     * 抽取申报书信息，同时返回项目名称
+     * @param file
+     * @param start
+     * @param end
+     * @return       String[0]:titile  String[1]:content
+     */
+    public String[] extractFileContentWithTitle(File file, String start, String end) {
+        try {
+            String text = FileUtils.parseFileContent(file, false);
+            text = StringUtils.deleteCRLF(text);
+            String title = StringUtils.regFind(text.replaceAll("\\s+", ""), "否则申请书作废！）课题名称(.*?)研究方向及代码");
+            return new String[]{title, text.substring(text.indexOf(start) + start.length(), text.indexOf(end))};
+        } catch (Exception e) {
+            return new String[]{"", ""};
+        }
     }
 
     public static void main(String[] args) {
-        String path = "C:\\D\\document\\graduation_design\\others\\cluster_part\\general_app_2009_10592_20090601214441937.doc";
+        String path = "C:\\D\\document\\graduation_design\\others\\cluster_part\\general_app_2009_10001_20090519232211667.doc";
         String start = "一、本课题研究的理论和实际应用价值，目前国内外研究的现状和趋势（限2页，不能加页）";
         String end = "三、本课题的研究思路和研究方法、计划进度、前期研究基础及资料准备情况（限2页，不能加页）";
 
         ApplicationFileProcess afp = new ApplicationFileProcess();
         String text = afp.extractFileContent(new File(path), start, end);
 
-        WordsSegmentByIKAnalyzer wsbi = new WordsSegmentByIKAnalyzer();
-        System.out.println(wsbi.segment(text.replaceAll("\\s+", "")));
-        System.out.println(text);
+//        WordsSegmentByIKAnalyzer wsbi = new WordsSegmentByIKAnalyzer();
+//        System.out.println(wsbi.segment(text.replaceAll("\\s+", "")));
+//        System.out.println(text);
     }
 
 
